@@ -13,13 +13,17 @@
       <meta name="msapplication-TileColor" content="#b91d47">
       <meta name="theme-color" content="#ffffff">
       <style>
+         body{
+            scroll-behavior: smooth;
+         }
          .container{
             margin-right: auto;
             margin-left: auto;
             display: grid;
-            grid-gap: 1vw;
-            grid-template-columns: repeat(10, 9vw);
-            grid-template-rows: repeat(40, 9vw);
+            overflow-x: hidden;
+            grid-gap: 0.5vw;
+            grid-template-columns: repeat(2, 49vw);
+            grid-template-rows: repeat(200, 9vw);
          }
          .item{
             background-color: #ddd;
@@ -34,13 +38,52 @@
       </div>
       <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous">
       </script>
+      <script type="text/javascript" src="./smoothscroll.js"></script>
       <script type="text/javascript">
          $(document).ready(function(){
+            $(window).scrollTop(0);
             var i;
             for(i=0 ; i<400; i++){
                $('<div />', { "class": "item item"+i.toString(), text : i.toString()}).appendTo(".container")
             }
+            var el = $(".container")[0];
+            el.addEventListener("touchstart", handleStart, false);
+            el.addEventListener("touchend", handleEnd, false);
+            el.addEventListener("touchcancel", handleCancel, false);
+             el.addEventListener("touchmove", handleMove, false);
          });
+
+         var touchHistory = [0,0,0];
+
+         function handleStart(evt) {
+            evt.preventDefault();
+            console.log("touch started")
+            var touches = evt.changedTouches;
+            touchHistory.fill(touches[0].clientY);
+         }
+
+         function handleEnd(evt) {
+            window.scrollBy({
+               top:(touchHistory[0] - touchHistory[1 ])*8,
+               left:0,
+               behavior:'smooth'
+         });
+         }
+
+
+         function handleCancel(evt) {
+            console.log("touch cancel")
+         }
+
+         function handleMove(evt) {
+            console.log(evt)
+            var touches = evt.changedTouches;
+            touchHistory.shift();
+            touchHistory.push(touches[0].clientY)
+            console.log(touchHistory);
+            window.scrollBy(0, touchHistory[1] - touchHistory[2]);
+         }
+
       </script>
    </body>
 </html>
