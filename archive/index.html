@@ -22,22 +22,27 @@
             width: 80%;
             overflow-x: hidden;
          }
-         .highlight, .target{
-            background-color: yellow;
-         }
-         .target:hover{
-            opacity: 0.2;
-         }
       </style>
    </head>
    <body>
-      <div id="Wrapper">
-        <span id="passage"></span>
+      <div id="Page">
+        <div id="passage"></div>
       </div>
       <script type="text/javascript">
         window.onload = function () {
             console.log("loading");
              'use strict';
+
+               var style = document.createElement('style');
+              style.innerHTML = `
+              .highlight, .target{
+                    background-color: yellow;
+                 }
+                 .target:hover{
+                    opacity: 0.2;
+                 }
+              `;
+              document.head.appendChild(style);
 
              window.scrollTo(0,0);
 
@@ -48,6 +53,9 @@
              passage.innerHTML = text;
 
              function updateTarget(word, n){
+                console.log("updating")
+                passage.innerHTML = passage.innerHTML.replace(/<span[^>]*>?/g,"")
+                passage.innerHTML = passage.innerHTML.replace(/<\/span>?/g,"")
                 passage.innerHTML = passage.innerHTML.replace(new RegExp( word +"[^\\w]", 'g' ), function(match){
                     return "<span class='highlight'>" + match + "</span>";
                 });
@@ -66,6 +74,26 @@
 
                  // mouse event
                  return e.clientY;
+             }
+
+             function finalypos(e) {
+                 // touch event
+                 if (e.changedTouches && (e.changedTouches.length >= 1)) {
+                     return e.changedTouches[0].clientY;
+                 }
+
+                 // mouse event
+                 return e.clientY;
+             }
+
+    function finalxpos(e) {
+                 // touch event
+                 if (e.changedTouches && (e.changedTouches.length >= 1)) {
+                     return e.changedTouches[0].clientX;
+                 }
+
+                 // mouse event
+                 return e.clientX;
              }
 
              function scroll(y) {
@@ -132,6 +160,10 @@
                  return false;
              }
 
+             function getElement(e){
+
+             }
+
              function release(e) {
                  pressed = false;
 
@@ -142,11 +174,14 @@
                      timestamp = Date.now();
                      requestAnimationFrame(autoScroll);
                  }
+                 if(document.elementsFromPoint(finalxpos(e),finalypos(e))[0].className == "target"){
+                    updateTarget("him",6);
+                 }
                  e.preventDefault();
                  e.stopPropagation();
                  return false;
              }
-             view = document.getElementById('Wrapper');
+             view = document.getElementById('Page');
              if (typeof window.ontouchstart !== 'undefined') {
                  view.addEventListener('touchstart', tap);
                  view.addEventListener('touchmove', drag);
