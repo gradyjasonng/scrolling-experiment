@@ -2,13 +2,17 @@ library(dplyr)
 library(stringr)
 library(tidyr)
 library(tidyverse)
+library(readr)
+
+feb14 <- read_csv("feb14.csv")
 
 working_set <- feb14 %>% slice(-1) 
+
+#Replace QID mappings
 
 for(search in QIDmapping$QID_time){
   searchval <- paste("QID",search, sep="")
   index <- which(search == QIDmapping$QID_time)
-  cat(searchval)
   working_set <- working_set %>% rename_at(vars(starts_with(searchval)), 
                                                funs(str_replace(., searchval, QIDmapping$Question[index])))
 }
@@ -16,13 +20,16 @@ for(search in QIDmapping$QID_time){
 for(search in QIDmapping$QID_var){
   searchval <- paste("QID",search, sep="")
   index <- which(search == QIDmapping$QID_var)
-  cat(searchval)
   working_set <- working_set %>% rename_at(vars(starts_with(searchval)), 
                                                funs(str_replace(., searchval, QIDmapping$Question[index])))
 }
 
+
+#Remove submissions that used mouse and keyboard
 working_set <- working_set %>% filter(N1_FIRST_CLICK == 0) 
 
+
+#Get useful data
 trunc_set <- working_set %>% dplyr::select(duration, finished,mTurkCode,QID2257_OS,QID2257_RESOLUTION,
          P1_PAGE_SUBMIT,P1_distance,P1_scrolls,
          P2_PAGE_SUBMIT,P2_distance,P2_scrolls,
@@ -48,11 +55,14 @@ trunc_set <- working_set %>% dplyr::select(duration, finished,mTurkCode,QID2257_
          S6_PAGE_SUBMIT,S6_distance,S6_scrolls
          )
 
-#CHECK FOR MTURK VALIDATION
+#Validate with mTurk
 merged_set <- merge(trunc_set, compiled_batches, by.x = "mTurkCode", by.y = "Answer.surveycode", all.x = TRUE)
 
+#Remove submissions not strictly validated with mTurk
 #trunc_set %>% filter(!(mTurkCode %in% merged_set$mTurkCode[is.na(merged_set$HITId)]))
 
+
+#Get analysis set
 analysis_set <- trunc_set %>% dplyr::select(mTurkCode, condition, order,
                                      N1_PAGE_SUBMIT,N1_distance,N1_scrolls,
                                      N2_PAGE_SUBMIT,N2_distance,N2_scrolls,
@@ -75,6 +85,7 @@ analysis_set <- trunc_set %>% dplyr::select(mTurkCode, condition, order,
 
 
 
+#Convert to long form
 df <- analysis_set %>% 
   pivot_longer(cols = -(1:3), names_to = "measure", values_to ="dv") 
 df <- df %>% mutate(condition = factor(condition, levels = c("npm","pm"), labels=c("No Metaphor","Metaphor") ),
@@ -89,12 +100,13 @@ df <- df %>% spread(measure, dv) %>% mutate(distance = as.numeric(distance),
 
 
 
-#ORDER CHECKING
+#Get order mappings
 order_working_set <- working_set %>% 
   dplyr::select(mTurkCode, FL_201_DO,FL_199_DO,FL_172_DO,FL_247_DO,FL_261_DO,FL_233_DO,FL_292_DO,
          FL_306_DO,FL_278_DO,FL_351_DO,FL_337_DO,FL_323_DO,FL_396_DO,FL_368_DO,
          FL_382_DO,FL_441_DO,FL_413_DO,FL_427_DO)
 
+#Create order lookup table
 order_set <- data.frame()
 for(i in 1:nrow(order_working_set)){
   chunk <- order_working_set[i,] %>% dplyr::select_if(~sum(!is.na(.)) > 0) 
@@ -107,6 +119,7 @@ order_set <- order_set %>% separate(N_order,sep="\\|",into=c("1N","2N","3N","4N"
   separate(S_order,sep="\\|",into=c("1S","2S","3S","4S","5S","6S")) %>% 
   mutate_if(is.character, str_replace_all, pattern = '([A-Z]).*(\\d)', replacement = '\\1\\2')
 
+#Match order to trial
 for (i in 1:nrow(df)) {
   matching_row <- order_set[as.character(order_set$mTurkCode) == as.character(df[i,1]), ]
   question_to_match <- as.character(df[i,"question"])
