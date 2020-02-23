@@ -94,8 +94,8 @@ df <- df %>% mutate(condition = factor(condition, levels = c("npm","pm"), labels
                                 measure = substring(measure, 4))
 df <- df %>% spread(measure, dv) %>% mutate(distance = as.numeric(distance),
                                                         scrolls = as.numeric(scrolls),
-                                                        RT = as.numeric(PAGE_SUBMIT)) %>%
-  dplyr::select(-PAGE_SUBMIT)
+                                                        PAGE_SUBMIT = as.numeric(PAGE_SUBMIT)) %>%
+  dplyr::rename(RT = PAGE_SUBMIT, metaphor = condition)
 
 
 
