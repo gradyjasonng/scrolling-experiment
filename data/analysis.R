@@ -67,6 +67,11 @@ ggplot(df, aes(RT, group = question, fill = texture)) +
   coord_cartesian(xlim = c(0,200))
 
 
+#each texture seems to have quite different means of target word distance
+df %>% group_by(texture) %>% summarize(mean = mean(targetdistance))
+ggplot(df, aes(targetdistance, log(RT), color = texture)) + geom_jitter(width=10, alpha = 0.5)
+
+
 #Plot scrolls by group
 ggplot(df, aes(texture, log(1+scrolls), fill = metaphor)) + 
   geom_boxplot(show.legend = F) +
@@ -107,17 +112,12 @@ ggplot(df, aes(RT)) +  geom_density() +
 
 
 #model fitting
-m1 <- glmer(RT ~ texture*metaphor + (texture|mTurkCode) + 
-              (1|question), data = df, 
-            family = Gamma(link = "identity"), verbose = 0,
+m1 <- glmer(RT ~ texture*metaphor + targetdistance + (texture|mTurkCode), data = df, 
+            family = Gamma(link = "identity"),
             control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
-
 
 #tests
 m <- m1
-
-#plot estimated effects
-plot_model(m, show.values = TRUE, value.offset = .3)
 
 
 #fitted against residuals
@@ -127,7 +127,8 @@ lines(smooth.spline(fitted(m), residuals(m)))
 
 summary(m)
 Anova(m)
-contrast(emmeans(m, "texture"))
-contrast(emmeans(m, "metaphor"))
 
-plot(emmeans(m, c("metaphor")), comparisons = TRUE)
+contrast(emmeans(m,"metaphor"))
+pairs(emmeans(m, c("metaphor", "texture")), by = "texture")
+plot(emmeans(m, c("metaphor", "texture")), comparisons = TRUE, by = "texture")
+

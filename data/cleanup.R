@@ -5,6 +5,8 @@ library(tidyverse)
 library(readr)
 
 feb14 <- read_csv("feb14.csv")
+QIDmapping <- read_csv("QIDmapping.csv")
+targetchardistance <- read_csv("targetchardistance.csv")
 
 working_set <- feb14 %>% slice(-1) 
 
@@ -124,6 +126,11 @@ for (i in 1:nrow(df)) {
   matching_row <- order_set[as.character(order_set$mTurkCode) == as.character(df[i,1]), ]
   question_to_match <- as.character(df[i,"question"])
   df[i,"trial"] <- as.numeric(substr(colnames(matching_row)[which(matching_row == question_to_match)], 1,1))
+}
+
+#Match char distance to question
+for (i in 1:nrow(df)) {
+  df[i,"targetdistance"] <-targetchardistance[targetchardistance$question == as.character(df[i, "question"]),2]
 }
 
 saveRDS(df, file = "./cleaned.rds")
