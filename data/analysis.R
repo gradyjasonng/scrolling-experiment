@@ -8,6 +8,7 @@ library(emmeans)
 library(sjPlot)
 library(gridExtra)
 library(fitdistrplus)
+library(dfoptim)
 
 df <- readRDS("./cleaned.rds")
 
@@ -111,13 +112,35 @@ ggplot(df, aes(RT)) +  geom_density() +
   coord_cartesian(ylim = c(0,0.03), xlim = c(0,200)) 
 
 
+df <- df %>% mutate(targetdistancescaled = scale(targetdistance))
+
 #model fitting
-m1 <- glmer(RT ~ texture*metaphor + targetdistance + (texture|mTurkCode), data = df, 
-            family = Gamma(link = "identity"),
+m1 <- glmer(RT ~  texture*metaphor + targetdistancescaled + (texture|mTurkCode), data = df, 
+            family = Gamma(link = "identity"))
+
+diff_optims <- allFit(m1, maxfun = 2e5, parallel = 'multicore', ncpus = detectCores())
+is.OK <- sapply(diff_optims, is, "merMod")
+diff_optims.OK <- diff_optims[is.OK]
+lapply(diff_optims.OK,function(x) x@optinfo$conv$lme4$messages)
+
+convergence_results <- lapply(diff_optims.OK,function(x) x@optinfo$conv$lme4$messages)
+working_indices <- sapply(convergence_results, is.null)
+
+if(sum(working_indices)==0){
+  print("No algorithms from allFit converged.")
+  print("You may still be able to use the results, but proceed with extreme caution.")
+  first_fit <- NULL
+} else {
+  first_fit <- diff_optims[working_indices][[1]] #bobyqa
+}
+
+#model using bobyqa optimizer
+m2 <- glmer(RT ~  texture*metaphor + targetdistancescaled + (texture|mTurkCode), data = df, 
+            family = Gamma(link = "identity"), 
             control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 
 #tests
-m <- m1
+m <- m2
 
 
 #fitted against residuals
