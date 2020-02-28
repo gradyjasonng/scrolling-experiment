@@ -21,35 +21,40 @@
 			margin:0;
 			background-color: #ccc;
 		}
+		h1{
+			font-size:2rem;
+			line-height: 2.3rem;
+		}
 		#panel{
 			position: fixed;
 			display: flex;
-			flex-direction: column;
-			justify-content: flex-start;
+			flex-direction: row;
+			justify-content: space-between;
 			margin:0;
 			padding: 10px 0;
 			z-index: 100;
-			background: #666;
 			color:#eee;
 			width: 100%;
-			height: 7vh;
 			text-transform: uppercase;
-			box-shadow: 0px 0px 8px #000a;
 			text-align: center;
 			font-weight: 800;
 		}
 		#panel ul{
 			list-style: none;
 			padding: 0 0;
-			margin: 5px 0 ;
+			margin: 5px 10px;
 			display: flex;
+			flex-direction: column;
 			justify-content:center;
+			box-shadow: 0px 0px 8px #000a;
 		}
 		#panel li{
-			margin:0 5px;
-			padding: 0.2rem;
-			font-size: 0.6rem;
-			line-height: 0.6rem;
+			background: #666;
+			opacity: 0.9;
+			margin:0;
+			padding: 0.7rem 0.4rem;
+			font-size: 0.3rem;
+			line-height: 0.4rem;
 			cursor: pointer;
 		}
 		#panel li.active{
@@ -58,14 +63,8 @@
 		}
 		#panel ul li:first-child{
 			pointer-events: none;
-		}
-		#panel ul#texture li{
-			max-width: 100px;
-			width: 25%;
-		}
-		#panel ul#metaphor li{
-			max-width: 150px;
-			width: 33%;
+			margin-bottom: 2px;
+			background: #333;
 		}
 		#Wrapper{
 			margin-right: auto;
@@ -74,6 +73,23 @@
 			overflow-x: hidden;
 			position: relative;
 			top: 20vh;
+		}
+		.desc{
+			font-size: 0.8rem;
+			line-height: 0.9rem;
+			font-style: italic;
+		}
+		#prompt-wrapper{
+			background: white;
+			padding: 2rem 10%;
+			margin-bottom: 2rem;
+		}
+		#prompt{
+			padding-top: 1rem;
+			font-size: 1.2rem;
+			line-height: 1.3rem;
+			font-style: normal;
+			font-weight: 800;
 		}
 		#passage{
 			background: white;
@@ -90,13 +106,17 @@
 			if(m){
 				if(multiplier>1){
 					document.body.style.backgroundImage = "linear-gradient(174deg, rgba(182,236,245,1) 0%, rgba(239,251,255,1) 44%, rgba(141,235,255,1) 100%)";
+					$("#prompt").text("For the next section, please imagine the page is on a smooth glass surface, like the background of this page.");
 				}else if(multiplier==1){
 					document.body.style.backgroundImage = "url('https://i.ibb.co/7VY53Xr/retina-wood-2-X.png')";
+					$("#prompt").text("For the next section, please imagine the page is on a normal wood surface, like the background of this page.");
 				}else{
 					document.body.style.backgroundImage = "url('https://i.ibb.co/y83Sbt7/cork-board.png')";
+					$("#prompt").text("For the next section, please imagine the page is on a rough sandpaper surface, like the background of this page.");
 				}
 			}else{
 				document.body.style.background = "#cccccc";
+				$("#prompt").text("For the next section, please perform the same task.");
 			}
 
 		}
@@ -112,7 +132,7 @@
 
 			bgInit(metaphor);
 
-			max = parseInt(getComputedStyle(view).height, 10) - innerHeight;
+			max = parseInt(getComputedStyle(view).height, 10)*1.1 - innerHeight;
 			offset = min = 0;
 			pressed = false;
 			xform = 'transform';
@@ -256,7 +276,7 @@ $(document).ready(function(){
 	<div id="panel">
 		<div>
 		<ul id="texture">
-			<li>Texture:</li>
+			<li>Texture</li>
 			<li onclick="scrollInit(0.7)" class="option">Rough</li>
 			<li onclick="scrollInit(1)" class="option active">Normal</li>
 			<li onclick="scrollInit(1.3)" class="option">Smooth</li>
@@ -264,54 +284,30 @@ $(document).ready(function(){
 	</div>
 	<div>
 		<ul id="metaphor">
-			<li>Metaphor:</li>
+			<li>Metaphor</li>
 			<li onclick="bgInit(true)" class="option">Present</li>
 			<li onclick="bgInit(false)" class="option active">Absent</li>
 		</ul>
 	</div>
 	</div>
 	<div id="Wrapper">
-		<div id="passage">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus elementum, eros eu ultrices pulvinar, augue nunc tincidunt dolor, non finibus nibh enim vitae ex. Donec congue at tortor ac imperdiet. Integer interdum auctor mi eget finibus. Donec sodales, nisl vel imperdiet bibendum, lorem diam ornare massa, tempor cursus justo nunc a velit. Integer tempus iaculis metus, quis varius arcu vulputate et. Mauris condimentum semper interdum. Nunc in enim nec justo rutrum ultricies eget vel augue.
+		<div id="prompt-wrapper">
+			<h2>A Cognitive Exploration of Intuition in Touchscreen Interactions</h2>
+			This is a demo of how a typical experimental trial used in the study would look like. Use the menus on the sides of the page to simulate the manipulations used in the experiment.
+		</div>
+		<div id="prompt-wrapper">
+			<div class="desc">The following instruction was presented to the participant for this particular condition.</div>
+			<div id="prompt">If you're viewing this on a computer, don't panic. Your trackpad and mousewheel scrolling has been disabled.</div>
+		</div>
+		<div id="passage">
+			<div class="desc">The following is an example of a trial that a participant would have completed. While clicking on the target word would advance the page, this action has been disabled for demonstration purposes.</div>
+			<h3>Please find the word: BENCHMARK</h3>
 
-			Ut in diam sem. Morbi finibus arcu sed lorem finibus lacinia. Sed interdum, dui a sollicitudin blandit, odio lorem congue erat, quis feugiat lorem lacus ut nisi. Nulla pharetra justo vel metus lacinia, quis dignissim nisl malesuada. Quisque cursus blandit metus suscipit convallis. Praesent scelerisque mi a vehicula blandit. Pellentesque ut velit a sapien interdum ultrices. Nulla eget cursus risus. Donec sollicitudin iaculis velit in facilisis. Vivamus pharetra est a nisl hendrerit, a lacinia urna mollis. Morbi eu libero condimentum, venenatis metus vitae, tempus libero. Ut sagittis nisi augue, quis dapibus lorem maximus sit amet.
-
-			Morbi vestibulum tempus tellus, at vulputate quam elementum sit amet. Vestibulum ac sollicitudin nisl. Fusce imperdiet, quam vel varius accumsan, ante dolor consectetur mauris, eu volutpat mi arcu et tortor. Integer vulputate euismod lacinia. Aenean elementum ex libero, non ornare tortor eleifend auctor. Nunc sit amet massa nulla. Etiam eget pellentesque leo. Praesent mattis dignissim ex sit amet sagittis. Nunc justo enim, commodo eu elementum vel, semper sed dolor. Morbi dictum mauris odio. Nulla eget bibendum nisl. Vivamus tristique feugiat nulla, sit amet posuere mi pellentesque vitae. Nam scelerisque vitae ligula nec sollicitudin. Aliquam suscipit semper libero eu volutpat. Phasellus rutrum tempor pretium. Sed rutrum pharetra neque.
-
-			Nullam eu justo iaculis, porttitor risus sed, egestas velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas pharetra vitae velit sed interdum. Aliquam leo elit, venenatis a consectetur dapibus, finibus et ex. Curabitur lectus arcu, feugiat vel ante ut, hendrerit ultrices sapien. Curabitur eu dui leo. Ut sed gravida nulla. Proin orci ligula, scelerisque ut sagittis non, accumsan at nibh. In rhoncus quam ac ipsum volutpat, vel porttitor elit rhoncus. Aliquam ac arcu mattis, euismod risus non, posuere risus.
-
-			In venenatis lobortis tellus a imperdiet. Vivamus justo tortor, euismod eu blandit eget, pulvinar et tellus. Nunc bibendum ut purus nec ultricies. Nunc egestas dui vitae lacus lacinia, sit amet hendrerit libero semper. Proin eget nisl commodo est laoreet facilisis et vitae dui. Cras sit amet urna et justo cursus condimentum. Nunc pretium consectetur teLorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus elementum, eros eu ultrices pulvinar, augue nunc tincidunt dolor, non finibus nibh enim vitae ex. Donec congue at tortor ac imperdiet. Integer interdum auctor mi eget finibus. Donec sodales, nisl vel imperdiet bibendum, lorem diam ornare massa, tempor cursus justo nunc a velit. Integer tempus iaculis metus, quis varius arcu vulputate et. Mauris condimentum semper interdum. Nunc in enim nec justo rutrum ultricies eget vel augue.
-
-			Ut in diam sem. Morbi finibus arcu sed lorem finibus lacinia. Sed interdum, dui a sollicitudin blandit, odio lorem congue erat, quis feugiat lorem lacus ut nisi. Nulla pharetra justo vel metus lacinia, quis dignissim nisl malesuada. Quisque cursus blandit metus suscipit convallis. Praesent scelerisque mi a vehicula blandit. Pellentesque ut velit a sapien interdum ultrices. Nulla eget cursus risus. Donec sollicitudin iaculis velit in facilisis. Vivamus pharetra est a nisl hendrerit, a lacinia urna mollis. Morbi eu libero condimentum, venenatis metus vitae, tempus libero. Ut sagittis nisi augue, quis dapibus lorem maximus sit amet.
-
-			Morbi vestibulum tempus tellus, at vulputate quam elementum sit amet. Vestibulum ac sollicitudin nisl. Fusce imperdiet, quam vel varius accumsan, ante dolor consectetur mauris, eu volutpat mi arcu et tortor. Integer vulputate euismod lacinia. Aenean elementum ex libero, non ornare tortor eleifend auctor. Nunc sit amet massa nulla. Etiam eget pellentesque leo. Praesent mattis dignissim ex sit amet sagittis. Nunc justo enim, commodo eu elementum vel, semper sed dolor. Morbi dictum mauris odio. Nulla eget bibendum nisl. Vivamus tristique feugiat nulla, sit amet posuere mi pellentesque vitae. Nam scelerisque vitae ligula nec sollicitudin. Aliquam suscipit semper libero eu volutpat. Phasellus rutrum tempor pretium. Sed rutrum pharetra neque.
-
-			Nullam eu justo iaculis, porttitor risus sed, egestas velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas pharetra vitae velit sed interdum. Aliquam leo elit, venenatis a consectetur dapibus, finibus et ex. Curabitur lectus arcu, feugiat vel ante ut, hendrerit ultrices sapien. Curabitur eu dui leo. Ut sed gravida nulla. Proin orci ligula, scelerisque ut sagittis non, accumsan at nibh. In rhoncus quam ac ipsum volutpat, vel porttitor elit rhoncus. Aliquam ac arcu mattis, euismod risus non, posuere risus.
-
-			In venenatis lobortis tellus a imperdiet. Vivamus justo tortor, euismod eu blandit eget, pulvinar et tellus. Nunc bibendum ut purus nec ultricies. Nunc egestas dui vitae lacus lacinia, sit amet hendrerit libero semper. Proin eget nisl commodo est laoreet facilisis et vitae dui. Cras sit amet urna et justo cursus condimentum. Nunc pretium consectetur teLorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus elementum, eros eu ultrices pulvinar, augue nunc tincidunt dolor, non finibus nibh enim vitae ex. Donec congue at tortor ac imperdiet. Integer interdum auctor mi eget finibus. Donec sodales, nisl vel imperdiet bibendum, lorem diam ornare massa, tempor cursus justo nunc a velit. Integer tempus iaculis metus, quis varius arcu vulputate et. Mauris condimentum semper interdum. Nunc in enim nec justo rutrum ultricies eget vel augue.
-
-			Ut in diam sem. Morbi finibus arcu sed lorem finibus lacinia. Sed interdum, dui a sollicitudin blandit, odio lorem congue erat, quis feugiat lorem lacus ut nisi. Nulla pharetra justo vel metus lacinia, quis dignissim nisl malesuada. Quisque cursus blandit metus suscipit convallis. Praesent scelerisque mi a vehicula blandit. Pellentesque ut velit a sapien interdum ultrices. Nulla eget cursus risus. Donec sollicitudin iaculis velit in facilisis. Vivamus pharetra est a nisl hendrerit, a lacinia urna mollis. Morbi eu libero condimentum, venenatis metus vitae, tempus libero. Ut sagittis nisi augue, quis dapibus lorem maximus sit amet.
-
-			Morbi vestibulum tempus tellus, at vulputate quam elementum sit amet. Vestibulum ac sollicitudin nisl. Fusce imperdiet, quam vel varius accumsan, ante dolor consectetur mauris, eu volutpat mi arcu et tortor. Integer vulputate euismod lacinia. Aenean elementum ex libero, non ornare tortor eleifend auctor. Nunc sit amet massa nulla. Etiam eget pellentesque leo. Praesent mattis dignissim ex sit amet sagittis. Nunc justo enim, commodo eu elementum vel, semper sed dolor. Morbi dictum mauris odio. Nulla eget bibendum nisl. Vivamus tristique feugiat nulla, sit amet posuere mi pellentesque vitae. Nam scelerisque vitae ligula nec sollicitudin. Aliquam suscipit semper libero eu volutpat. Phasellus rutrum tempor pretium. Sed rutrum pharetra neque.
-
-			Nullam eu justo iaculis, porttitor risus sed, egestas velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas pharetra vitae velit sed interdum. Aliquam leo elit, venenatis a consectetur dapibus, finibus et ex. Curabitur lectus arcu, feugiat vel ante ut, hendrerit ultrices sapien. Curabitur eu dui leo. Ut sed gravida nulla. Proin orci ligula, scelerisque ut sagittis non, accumsan at nibh. In rhoncus quam ac ipsum volutpat, vel porttitor elit rhoncus. Aliquam ac arcu mattis, euismod risus non, posuere risus.
-
-			In venenatis lobortis tellus a imperdiet. Vivamus justo tortor, euismod eu blandit eget, pulvinar et tellus. Nunc bibendum ut purus nec ultricies. Nunc egestas dui vitae lacus lacinia, sit amet hendrerit libero semper. Proin eget nisl commodo est laoreet facilisis et vitae dui. Cras sit amet urna et justo cursus condimentum. Nunc pretium consectetur teLorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus elementum, eros eu ultrices pulvinar, augue nunc tincidunt dolor, non finibus nibh enim vitae ex. Donec congue at tortor ac imperdiet. Integer interdum auctor mi eget finibus. Donec sodales, nisl vel imperdiet bibendum, lorem diam ornare massa, tempor cursus justo nunc a velit. Integer tempus iaculis metus, quis varius arcu vulputate et. Mauris condimentum semper interdum. Nunc in enim nec justo rutrum ultricies eget vel augue.
-
-			Ut in diam sem. Morbi finibus arcu sed lorem finibus lacinia. Sed interdum, dui a sollicitudin blandit, odio lorem congue erat, quis feugiat lorem lacus ut nisi. Nulla pharetra justo vel metus lacinia, quis dignissim nisl malesuada. Quisque cursus blandit metus suscipit convallis. Praesent scelerisque mi a vehicula blandit. Pellentesque ut velit a sapien interdum ultrices. Nulla eget cursus risus. Donec sollicitudin iaculis velit in facilisis. Vivamus pharetra est a nisl hendrerit, a lacinia urna mollis. Morbi eu libero condimentum, venenatis metus vitae, tempus libero. Ut sagittis nisi augue, quis dapibus lorem maximus sit amet.
-
-			Morbi vestibulum tempus tellus, at vulputate quam elementum sit amet. Vestibulum ac sollicitudin nisl. Fusce imperdiet, quam vel varius accumsan, ante dolor consectetur mauris, eu volutpat mi arcu et tortor. Integer vulputate euismod lacinia. Aenean elementum ex libero, non ornare tortor eleifend auctor. Nunc sit amet massa nulla. Etiam eget pellentesque leo. Praesent mattis dignissim ex sit amet sagittis. Nunc justo enim, commodo eu elementum vel, semper sed dolor. Morbi dictum mauris odio. Nulla eget bibendum nisl. Vivamus tristique feugiat nulla, sit amet posuere mi pellentesque vitae. Nam scelerisque vitae ligula nec sollicitudin. Aliquam suscipit semper libero eu volutpat. Phasellus rutrum tempor pretium. Sed rutrum pharetra neque.
-
-			Nullam eu justo iaculis, porttitor risus sed, egestas velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas pharetra vitae velit sed interdum. Aliquam leo elit, venenatis a consectetur dapibus, finibus et ex. Curabitur lectus arcu, feugiat vel ante ut, hendrerit ultrices sapien. Curabitur eu dui leo. Ut sed gravida nulla. Proin orci ligula, scelerisque ut sagittis non, accumsan at nibh. In rhoncus quam ac ipsum volutpat, vel porttitor elit rhoncus. Aliquam ac arcu mattis, euismod risus non, posuere risus.
-
-			In venenatis lobortis tellus a imperdiet. Vivamus justo tortor, euismod eu blandit eget, pulvinar et tellus. Nunc bibendum ut purus nec ultricies. Nunc egestas dui vitae lacus lacinia, sit amet hendrerit libero semper. Proin eget nisl commodo est laoreet facilisis et vitae dui. Cras sit amet urna et justo cursus condimentum. Nunc pretium consectetur teLorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus elementum, eros eu ultrices pulvinar, augue nunc tincidunt dolor, non finibus nibh enim vitae ex. Donec congue at tortor ac imperdiet. Integer interdum auctor mi eget finibus. Donec sodales, nisl vel imperdiet bibendum, lorem diam ornare massa, tempor cursus justo nunc a velit. Integer tempus iaculis metus, quis varius arcu vulputate et. Mauris condimentum semper interdum. Nunc in enim nec justo rutrum ultricies eget vel augue.
-
-			Ut in diam sem. Morbi finibus arcu sed lorem finibus lacinia. Sed interdum, dui a sollicitudin blandit, odio lorem congue erat, quis feugiat lorem lacus ut nisi. Nulla pharetra justo vel metus lacinia, quis dignissim nisl malesuada. Quisque cursus blandit metus suscipit convallis. Praesent scelerisque mi a vehicula blandit. Pellentesque ut velit a sapien interdum ultrices. Nulla eget cursus risus. Donec sollicitudin iaculis velit in facilisis. Vivamus pharetra est a nisl hendrerit, a lacinia urna mollis. Morbi eu libero condimentum, venenatis metus vitae, tempus libero. Ut sagittis nisi augue, quis dapibus lorem maximus sit amet.
-
-			Morbi vestibulum tempus tellus, at vulputate quam elementum sit amet. Vestibulum ac sollicitudin nisl. Fusce imperdiet, quam vel varius accumsan, ante dolor consectetur mauris, eu volutpat mi arcu et tortor. Integer vulputate euismod lacinia. Aenean elementum ex libero, non ornare tortor eleifend auctor. Nunc sit amet massa nulla. Etiam eget pellentesque leo. Praesent mattis dignissim ex sit amet sagittis. Nunc justo enim, commodo eu elementum vel, semper sed dolor. Morbi dictum mauris odio. Nulla eget bibendum nisl. Vivamus tristique feugiat nulla, sit amet posuere mi pellentesque vitae. Nam scelerisque vitae ligula nec sollicitudin. Aliquam suscipit semper libero eu volutpat. Phasellus rutrum tempor pretium. Sed rutrum pharetra neque.
-
-			Nullam eu justo iaculis, porttitor risus sed, egestas velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas pharetra vitae velit sed interdum. Aliquam leo elit, venenatis a consectetur dapibus, finibus et ex. Curabitur lectus arcu, feugiat vel ante ut, hendrerit ultrices sapien. Curabitur eu dui leo. Ut sed gravida nulla. Proin orci ligula, scelerisque ut sagittis non, accumsan at nibh. In rhoncus quam ac ipsum volutpat, vel porttitor elit rhoncus. Aliquam ac arcu mattis, euismod risus non, posuere risus.
-
-		In venenatis lobortis tellus a imperdiet. Vivamus justo tortor, euismod eu blandit eget, pulvinar et tellus. Nunc bibendum ut purus nec ultricies. Nunc egestas dui vitae lacus lacinia, sit amet hendrerit libero semper. Proin eget nisl commodo est laoreet facilisis et vitae dui. Cras sit amet urna et justo cursus condimentum. Nunc pretium consectetur te</div>
+			<p>So every half hour throughout the experiments, the team plucked all the beetles off of half the fragrance-enhanced flowers and half the control flowers, allowing bees to respond to the blossoms with and without interference by beetles.</p>
+			<p>Finally, they pollinated by hand half of the female flowers in each of the four combinations of fragrance and beetles. Hand-pollinated flowers should develop into fruits with the maximum number of seeds, providing a benchmark to see whether the fragrance-related activities of bees and beetles resulted in reduced pollination.</p>
+			<p>“It was very labor intensive,” says Theis.</p>
+			<p>“We would be out there at four in the morning, three in the morning, to try and setup before these flowers open.” As soon as they did, the team spent the next several hours walking from flower to flower, observing each for two-minute intervals “and writing down everything we saw.”</p>
+			<p>What they saw was double the normal number of beetles on fragrance-enhanced blossoms. Pollinators, to their surprise, did not prefer the highly scented flowers. Squash bees were indifferent, and honey bees visited enhanced flowers less often than normal ones. Theis thinks the bees were repelled not by the fragrance itself, but by the abundance of beetles: The data showed that the more beetles on a flower, the less likely a honey bee was to visit it. That added up to less reproduction for fragrance-enhanced flowers. Gourds that developed from those blossoms weighed 9 percent less and had, on average, 20 fewer seeds than those from normal flowers. Hand pollination didn’t rescue the seed set, indicating that beetles damaged flowers directly —regardless of whether they also repelled pollinators. (Hand pollination did rescue fruit weight, a hard-to-interpret result that suggests that lost bee visits did somehow harm fruit development.) The new results provide a reason that Texas gourd plants never evolved to produce a stronger scent: “If you really ramp up the odor, you don’t get more pollinators, but you can really get ripped apart by your enemies,” says Rob Raguso, a chemical ecologist at Cornell University who was not involved in the Texas gourd study.</p></div>
 	</div>
 </body>
 </html>
