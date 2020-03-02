@@ -91,7 +91,7 @@ analysis_set <- trunc_set %>% dplyr::select(mTurkCode, condition, order,
 df <- analysis_set %>% 
   pivot_longer(cols = -(1:3), names_to = "measure", values_to ="dv") 
 df <- df %>% mutate(condition = factor(condition, levels = c("npm","pm"), labels=c("No Metaphor","Metaphor") ),
-                                texture = factor(substr(measure, 1, 1), levels = c("N","R","S"), labels = c("Normal", "Rough","Smooth")),
+                                friction = factor(substr(measure, 1, 1), levels = c("N","R","S"), labels = c("Native", "High","Low")),
                                 question = substr(measure, 1, 2),
                                 measure = substring(measure, 4))
 df <- df %>% spread(measure, dv) %>% mutate(distance = as.numeric(distance),
@@ -132,6 +132,15 @@ for (i in 1:nrow(df)) {
 for (i in 1:nrow(df)) {
   df[i,"charsBeforeTarget"] <-targetchardistance[targetchardistance$question == as.character(df[i, "question"]),2]
 }
+
+
+#rename friction conditions
+df <- df %>% mutate(
+  order = gsub('S', 'L', order),
+  order = gsub('R', 'H', order),
+  question = gsub('S', 'L', question),
+  question = gsub('R', 'H', question)
+)
 
 saveRDS(df, file = "./cleaned.rds")
 
