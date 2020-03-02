@@ -91,7 +91,7 @@ analysis_set <- trunc_set %>% dplyr::select(mTurkCode, condition, order,
 df <- analysis_set %>% 
   pivot_longer(cols = -(1:3), names_to = "measure", values_to ="dv") 
 df <- df %>% mutate(condition = factor(condition, levels = c("npm","pm"), labels=c("No Metaphor","Metaphor") ),
-                                texture = factor(substr(measure, 1, 1), levels = c("R","N","S"), labels = c("Rough", "Normal","Smooth")),
+                                texture = factor(substr(measure, 1, 1), levels = c("N","R","S"), labels = c("Normal", "Rough","Smooth")),
                                 question = substr(measure, 1, 2),
                                 measure = substring(measure, 4))
 df <- df %>% spread(measure, dv) %>% mutate(distance = as.numeric(distance),
@@ -130,7 +130,7 @@ for (i in 1:nrow(df)) {
 
 #Match char distance to question
 for (i in 1:nrow(df)) {
-  df[i,"targetdistance"] <-targetchardistance[targetchardistance$question == as.character(df[i, "question"]),2]
+  df[i,"charsBeforeTarget"] <-targetchardistance[targetchardistance$question == as.character(df[i, "question"]),2]
 }
 
 saveRDS(df, file = "./cleaned.rds")

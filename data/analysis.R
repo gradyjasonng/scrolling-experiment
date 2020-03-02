@@ -15,6 +15,15 @@ df <- readRDS("./cleaned.rds")
 #set ylim within 1.6x of outlier cutoff
 ylim1 = boxplot.stats(df$RT)$stats[c(1, 5)]*1.6
 
+old <- theme_set(theme_minimal()) 
+theme_set(theme_bw())
+
+theme_update(panel.background = element_rect(fill = "transparent"), # bg of the panel
+             plot.background = element_rect(fill = "transparent", color = NA), # bg of the plot
+             legend.background = element_rect(fill = "transparent"), # get rid of legend bg
+             legend.box.background = element_rect(fill = "transparent", color = NA) # get rid of legend panel bg
+)
+
 #raw RT by metaphor 
 ggplot(df, aes(metaphor, RT, fill= metaphor)) + geom_boxplot(width = 0.4) + 
   coord_cartesian(ylim = ylim1) +
@@ -22,22 +31,47 @@ ggplot(df, aes(metaphor, RT, fill= metaphor)) + geom_boxplot(width = 0.4) +
   geom_text(data = aggregate(RT ~ metaphor, df, median) %>% mutate(RT = round(RT,1)), aes(label = RT, y = RT), nudge_y = 3) +
   geom_text(data = aggregate(RT~ metaphor, df, function(x) paste(sum(!between(x, ylim1[1], ylim1[2])), "outliers\nnot shown")), 
             aes(label = RT, y = 140), nudge_x = 0.25) +
-  geom_text(data = aggregate(RT~ metaphor, df, function(x) paste("n =", length(x))), aes(label = RT, y = 0))
+  geom_text(data = aggregate(RT~ metaphor, df, function(x) paste("n =", length(x))), aes(label = RT, y = 0)) 
 
+ggsave("plots/rawRT-metaphor.png", width = 6, height = 7, units ="in", bg = 'transparent')
 
-#raw RT by groups
+#raw RT by texture 
+ggplot(df, aes(texture, RT, fill= texture)) + geom_boxplot(width = 0.4) + 
+  coord_cartesian(ylim = ylim1) +
+  stat_summary(fun.y=mean, geom="point", shape=1, size=1, color="black", fill="black") +
+  geom_text(data = aggregate(RT ~ texture, df, median) %>% mutate(RT = round(RT,1)), aes(label = RT, y = RT), nudge_y = 3) +
+  geom_text(data = aggregate(RT~ texture, df, function(x) paste(sum(!between(x, ylim1[1], ylim1[2])), "outliers\nnot shown")), 
+            aes(label = RT, y = 140), nudge_x = 0.25) +
+  geom_text(data = aggregate(RT~ texture, df, function(x) paste("n =", length(x))), aes(label = RT, y = 0)) 
+
+ggsave("plots/rawRT-texture.png", width = 8, height = 6, units ="in", bg = 'transparent')
+
+ggplot(df, aes(texture, RT, fill= texture)) + geom_boxplot(width = 0.4) + 
+  coord_cartesian(ylim = ylim1) +
+  facet_grid(cols = vars(metaphor)) +
+  stat_summary(fun.y=mean, geom="point", shape=1, size=1, color="black", fill="black") +
+  geom_text(data = aggregate(RT ~ metaphor*texture, df, median) %>% mutate(RT = round(RT,1)), aes(label = RT, y = RT), nudge_y = 3) +
+  geom_text(data = aggregate(RT~ metaphor*texture, df, function(x) paste(sum(!between(x, ylim1[1], ylim1[2])), "outliers\nnot shown")), 
+            aes(label = RT, y = 145), nudge_x = 0, size = 3) +
+  geom_text(data = aggregate(RT~ texture, df, function(x) paste("n =", length(x))), aes(label = RT, y = 0)) 
+
+ggsave("plots/rawRT-groups-texture.png", width = 8, height = 6, units ="in", bg = 'transparent')
+
+#raw RT by groups - metaphor
 ggplot(df, aes(metaphor, RT, fill = metaphor)) +  geom_boxplot(width = 0.4) + 
   facet_grid(cols = vars(texture)) +
   stat_summary(fun.y=mean, geom="point", shape=1, size=1, color="black", fill="black") +
   geom_text(data = aggregate(RT ~ metaphor*texture, df, median) %>% mutate(RT = round(RT,1)), aes(label = RT, y = RT), nudge_y = 3) +
   coord_cartesian(ylim = ylim1) +
-  geom_text(data = aggregate(RT~ metaphor*texture, df, function(x) paste(sum(!between(x, ylim1[1], ylim1[2])), "outliers not shown")), 
+  geom_text(data = aggregate(RT~ metaphor*texture, df, function(x) paste(sum(!between(x, ylim1[1], ylim1[2])), "outliers\nnot shown")), 
             aes(label = RT, y = 145), nudge_x = 0, size=3) +
   geom_text(data = aggregate(RT~ metaphor*texture, df, function(x) paste("n =", length(x))), aes(label = RT, y = 0))
+ggsave("plots/rawRT-groups-metaphor.png", width = 8, height = 6, units ="in", bg = 'transparent')
 
 #logged RT summary
 ggplot(df, aes(metaphor, log(RT), fill = metaphor)) +  geom_boxplot(width= 0.3) + 
   facet_grid(cols = vars(texture))
+ggsave("plots/rawRT-metaphor.png", width = 8, height = 6, units ="in", bg = 'transparent')
 
 ggplot(df, aes(metaphor, log(RT), fill= texture)) + geom_boxplot()
 
@@ -46,10 +80,24 @@ ggplot(df, aes(as.character(trial), log(RT), fill =trial)) + geom_boxplot( alpha
   facet_grid(cols = vars(metaphor)) +
   stat_summary(aes(y = log(RT),group=1), fun.y=median, colour="red", geom="line") + 
   stat_summary(aes(y = log(RT),group=1), fun.y=median, colour="red", geom="point") 
+ggsave("plots/loggedRT-trial.png", width = 8, height = 6, units ="in", bg = 'transparent')
+
+
+#logged RT by trial, by participant
+ggplot(df %>% filter(texture == "Normal"), aes(trial, log(RT)))  + 
+  geom_smooth(aes(group = mTurkCode),method="lm", se=F, alpha = 0.2, size = 0.2)
+
+ggplot(df %>% filter(texture == "Rough"), aes(trial, log(RT)))  + 
+  geom_smooth(aes(group = mTurkCode),method="lm", se=F, alpha = 0.2, size = 0.2)
+
+ggplot(df %>% filter(texture == "Smooth"), aes(trial, log(RT)))  + 
+  geom_smooth(aes(group = mTurkCode),method="lm", se=F, alpha = 0.2, size = 0.2)
+
 
 #logged RT by order 
 ggplot(df, aes(order, log(RT), fill = order)) + 
   geom_boxplot(size = 0.5, width = 0.3, show.legend = F)
+ggsave("plots/loggedRT-order.png", width = 8, height = 6, units ="in", bg = 'transparent')
 
 ggplot(df, aes(RT, group = order, fill = texture)) + 
   facet_wrap(vars(texture), nrow = 3) +
@@ -61,6 +109,14 @@ ggplot(df, aes(RT, group = order, fill = texture)) +
 ggplot(df, aes(question, log(RT), fill = texture)) + 
   facet_wrap(vars(texture), scales = "free_x") +
   geom_boxplot(size = 0.5, width = 0.3, show.legend = F)
+ggsave("plots/loggedRT-question.png", width = 8, height = 6, units ="in", bg = 'transparent')
+
+#logged RT by question - ordered by target char distance
+ggplot(df, aes(reorder(question, charsBeforeTarget), log(RT), fill = texture)) + 
+  geom_boxplot(size = 0.5, width = 0.3, show.legend = F) +
+  labs(x = "Questions (Ordered by increasing target distance)") 
+ggsave("plots/loggedRT-question-ordered.png", width = 8, height = 6, units ="in", bg = 'transparent')
+
 
 ggplot(df, aes(RT, group = question, fill = texture)) + 
   facet_wrap(vars(texture), nrow = 3) +
@@ -69,9 +125,15 @@ ggplot(df, aes(RT, group = question, fill = texture)) +
 
 
 #each texture seems to have quite different means of target word distance
-df %>% group_by(texture) %>% summarize(mean = mean(targetdistance))
-ggplot(df, aes(targetdistance, log(RT), color = texture)) + geom_jitter(width=10, alpha = 0.5)
+meanCBT <- df %>% group_by(texture) %>% summarize(mean = mean(charsBeforeTarget))
 
+summary(lm(RT ~ charsBeforeTarget, data = df))
+
+ggplot(df, aes(charsBeforeTarget, log(RT), color = texture)) + geom_jitter(width=5, alpha = 0.4) +
+  stat_summary(fun.y=mean, geom="point", shape=4, size=3, color="black", fill="black", alpha = 0.7) +
+  geom_vline(xintercept = meanCBT$mean, color = c("red", "green", "blue")) +
+  geom_smooth(method='lm', color = 1, size = 0.2)
+ggsave("plots/loggedRT-charBeforeTarget.png", width = 8, height = 6, units ="in", bg = 'transparent')
 
 #Plot scrolls by group
 ggplot(df, aes(texture, log(1+scrolls), fill = metaphor)) + 
@@ -89,9 +151,11 @@ ggplot(df, aes(texture, distance, fill = metaphor)) +
 #RT density distrbutions across groups
 p1 <- ggplot(df, aes(RT)) + geom_density() + coord_cartesian(xlim = c(0,300))
 p2 <- ggplot(df, aes(RT)) + geom_density() + facet_wrap(texture ~ metaphor, ncol = 2) + coord_cartesian(xlim = c(0,300))
-grid.arrange(p1,p2, nrow=1)
+p3 <- grid.arrange(p1,p2, nrow=1)
+ggsave("plots/group-density.png", plot = p3, width = 8, height = 5, units ="in", bg = 'transparent')
 
 leveneTest(RT ~ metaphor*texture, data = df) # p = 0.5046 
+
 
 normFit <- fitdist(df$RT, dnorm)
 gammaFit <- fitdist(df$RT, dgamma)
@@ -107,40 +171,20 @@ summary(lnormFit)
 
 ggplot(df, aes(RT)) +  geom_density() + 
   geom_line(aes(x=df$RT, y=dnorm(df$RT, normFit$estimate["mean"], norm$estimate["sd"])), color="green", size = 0.8, alpha = 0.6) +
-  geom_line(aes(x=df$RT, y=dlnorm(df$RT, lnormFit$estimate["meanlog"], lnormFit$estimate["sdlog"])), color="red", size = 0.8, alpha = 0.6) +
+  #geom_line(aes(x=df$RT, y=dlnorm(df$RT, lnormFit$estimate["meanlog"], lnormFit$estimate["sdlog"])), color="red", size = 0.8, alpha = 0.6) +
   geom_line(aes(x=df$RT, y=dgamma(df$RT,gammaFit$estimate["shape"], gammaFit$estimate["rate"])), color="blue", size = 0.8, alpha = 0.6) +
   coord_cartesian(ylim = c(0,0.03), xlim = c(0,200)) 
+ggsave("plots/distr-comparison.png", width = 5, height = 5, units ="in", bg = 'transparent')
 
-
-df <- df %>% mutate(targetdistancescaled = scale(targetdistance))
+df <- df %>% mutate(charsBeforeTargetscaled = scale(charsBeforeTarget), trialScaled = scale(trial)) 
 
 #model fitting
-m1 <- glmer(RT ~  texture*metaphor + targetdistancescaled + (texture|mTurkCode), data = df, 
-            family = Gamma(link = "identity"))
-
-diff_optims <- allFit(m1, maxfun = 2e5, parallel = 'multicore', ncpus = detectCores())
-is.OK <- sapply(diff_optims, is, "merMod")
-diff_optims.OK <- diff_optims[is.OK]
-lapply(diff_optims.OK,function(x) x@optinfo$conv$lme4$messages)
-
-convergence_results <- lapply(diff_optims.OK,function(x) x@optinfo$conv$lme4$messages)
-working_indices <- sapply(convergence_results, is.null)
-
-if(sum(working_indices)==0){
-  print("No algorithms from allFit converged.")
-  print("You may still be able to use the results, but proceed with extreme caution.")
-  first_fit <- NULL
-} else {
-  first_fit <- diff_optims[working_indices][[1]] #bobyqa
-}
-
-#model using bobyqa optimizer
-m2 <- glmer(RT ~  texture*metaphor + targetdistancescaled + (texture|mTurkCode), data = df, 
+m0 <- glmer(RT ~  texture*metaphor + charsBeforeTargetscaled + (texture|mTurkCode) + (trialScaled|mTurkCode), data = df, 
             family = Gamma(link = "identity"), 
             control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 
 #tests
-m <- m2
+m <- m0
 
 
 #fitted against residuals
@@ -151,7 +195,11 @@ lines(smooth.spline(fitted(m), residuals(m)))
 summary(m)
 Anova(m)
 
-contrast(emmeans(m,"metaphor"))
-pairs(emmeans(m, c("metaphor", "texture")), by = "texture")
+cor(df$RT, fitted(m))^2
+
+ggplot(m) + geom_histogram(aes(.resid), bins = 30)
+
+plot_model(m, type = "eff")
+pairs(emmeans(m,c("metaphor",'texture')), by = "texture")
 plot(emmeans(m, c("metaphor", "texture")), comparisons = TRUE, by = "texture")
 

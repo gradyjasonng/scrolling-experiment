@@ -25,6 +25,14 @@
 			font-size:2rem;
 			line-height: 2.3rem;
 		}
+		.noselect {
+		-webkit-touch-callout: none; /* iOS Safari */
+		-webkit-user-select: none; /* Safari */
+		-khtml-user-select: none; /* Konqueror HTML */
+		-moz-user-select: none; /* Old versions of Firefox */
+		-ms-user-select: none; /* Internet Explorer/Edge */
+		user-select: none; /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
+		}
 		#panel{
 			position: fixed;
 			display: flex;
@@ -70,7 +78,7 @@
 			margin-right: auto;
 			margin-left: auto;
 			width: 80%;
-			overflow-x: hidden;
+			overflow-y: hidden;
 			position: relative;
 			top: 20vh;
 		}
@@ -132,7 +140,7 @@
 
 			bgInit(metaphor);
 
-			max = parseInt(getComputedStyle(view).height, 10)*1.1 - innerHeight;
+			max = parseInt(getComputedStyle(view).height, 10)*1.15 - innerHeight;
 			offset = min = 0;
 			pressed = false;
 			xform = 'transform';
@@ -273,7 +281,7 @@ $(document).ready(function(){
 
 </head>
 <body>
-	<div id="panel">
+	<div id="panel" class="noselect">
 		<div>
 		<ul id="texture">
 			<li>Texture</li>
@@ -290,7 +298,7 @@ $(document).ready(function(){
 		</ul>
 	</div>
 	</div>
-	<div id="Wrapper">
+	<div id="Wrapper" class="noselect">
 		<div id="prompt-wrapper">
 			<h2>A Cognitive Exploration of Intuition in Touchscreen Interactions</h2>
 			This is a demo of how a typical experimental trial used in the study would look like. Use the menus on the sides of the page to simulate the manipulations used in the experiment.
