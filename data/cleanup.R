@@ -121,11 +121,12 @@ order_set <- order_set %>% separate(N_order,sep="\\|",into=c("1N","2N","3N","4N"
   separate(S_order,sep="\\|",into=c("1S","2S","3S","4S","5S","6S")) %>% 
   mutate_if(is.character, str_replace_all, pattern = '([A-Z]).*(\\d)', replacement = '\\1\\2')
 
-#Match order to trial
+#Match order to trial, and add block number
 for (i in 1:nrow(df)) {
   matching_row <- order_set[as.character(order_set$mTurkCode) == as.character(df[i,1]), ]
   question_to_match <- as.character(df[i,"question"])
   df[i,"trial"] <- as.numeric(substr(colnames(matching_row)[which(matching_row == question_to_match)], 1,1))
+  df[i, "block"] <- as.character(str_locate(df[i,"order"], substr(question_to_match,1,1))[1])
 }
 
 #Match char distance to question
@@ -134,13 +135,16 @@ for (i in 1:nrow(df)) {
 }
 
 
-#rename friction conditions
+
 df <- df %>% mutate(
+  #rename friction conditions
   order = gsub('S', 'L', order),
   order = gsub('R', 'H', order),
   question = gsub('S', 'L', question),
-  question = gsub('R', 'H', question)
-)
+  question = gsub('R', 'H', question),
+  #add scaled variables
+  charsBeforeTargetscaled = scale(charsBeforeTarget), 
+  trialScaled = scale(trial)) 
 
 saveRDS(df, file = "./cleaned.rds")
 
